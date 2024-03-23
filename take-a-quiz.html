@@ -32,7 +32,7 @@
     getQuizzes();
 
     async function getQuizzes() {
-      let response = await fetch(`http://${host}/quizzes`);
+      let response = await fetch(`${host}/quizzes`);
       let data = await response.json();
 
       console.log(data);
