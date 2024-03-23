@@ -26,7 +26,7 @@
     </div>
   <script>
 
-    let host = "localhost:8080";
+    let host = "https://c322-midterm-backend-latest-5s92.onrender.com";
     let quizList = document.getElementById("quizList");
 
     getQuizzes();
@@ -47,7 +47,7 @@
             </div>
           </div>
         `;
-        
+
         card.onclick = () => {
           localStorage.setItem("quiz", JSON.stringify(quiz));
           window.location.href = "quiz.html";
