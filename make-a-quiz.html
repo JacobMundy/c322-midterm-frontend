@@ -65,7 +65,7 @@
         card.className = "card";
         card.innerHTML = `
           <div class="container" onclick="addQuestion(event)" data-id="${q.id}">
-            <img src="http://${host}/questions/${q.id}/image" alt="Avatar" style="width:100%">
+            <img src="${host}/questions/${q.id}/image" alt="Avatar" style="width:100%">
             <h4><b>${q.id}</b></h4>
             <h2>${q.description}</h2>
             <form>
@@ -93,7 +93,7 @@
       let quizName = document.getElementById("userSubmittedName").value;
       let quizQuestions = addedQuestions;
       let quizNum = 0;
-      let response = await fetch(`http://${host}/quizzes`, {
+      let response = await fetch(`${host}/quizzes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
