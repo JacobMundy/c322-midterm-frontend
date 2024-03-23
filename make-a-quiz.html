@@ -48,7 +48,7 @@
     getQuestions();
 
     async function getQuestions() {
-      let response = await fetch(`http://${host}/questions`);
+      let response = await fetch(`${host}/questions`);
       let data = await response.json();
       questions = data;
       list.innerHTML = "";
