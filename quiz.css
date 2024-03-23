@@ -1,17 +1,73 @@
-.screen{
-    width: 40vw;
-    height: 24.7vw;
-    margin-left: 30vw;
-    margin-right: 30vw;
+.screen {
+  width: 40vw;
+  height: 24.7vw;
+  margin-left: 30vw;
+  margin-right: 30vw;
 }
 
 .controls {
     display: flex;
     justify-content: space-between;
-}
+    margin-left: 30vw; /* Adjust to move the buttons to the right */
+    margin-right: 30vw; /* Adjust to move the buttons to the left */
+  }
 
 .hide {
-    visibility: hidden;
-    display: none;
+  visibility: hidden;
+  display: none;
 }
 
+#quizContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.question {
+  margin-bottom: 20px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.question h3 {
+  margin-top: 0;
+}
+
+.options {
+  list-style-type: none;
+  padding: 0;
+}
+
+.options li {
+  margin-bottom: 10px;
+}
+
+.options li label {
+  display: flex;
+  align-items: center;
+}
+
+.options li input[type="radio"] {
+  margin-right: 10px;
+}
+/*i hate buttons i hate buttons i hate buttons i hate buttons */
+#buttonContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    max-width: 600px; /* Limit the width to match quizContainer */
+    margin: 0 auto; /* Center the buttonContainer */
+    padding: 0 20px; /* Add padding to match quizContainer */
+}
+
+#prevQuestion,
+#nextQuestion {
+    padding: 10px 20px;
+}
+  #counter {
+    text-align: center; /* Center the text */
+    margin-top: 20px; /* Add some space from the buttons */
+  }
+  

@@ -1,11 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" href="general.css">
+  <link rel="stylesheet" href="quiz.css">
+  <link rel="stylesheet" href="navbar.css">
+  <style>
+    #submitQuiz {
+      display: block;
+      margin: 0 auto;
+      text-align: center;
+      display: none;
+      /* Hide the button by default */
+    }
+  </style>
+  <title>Quiz</title>
 </head>
+
 <body>
-  
+  <ul class="topnav" id="navbar">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="add-question.html">Add questions</a></li>
+    <li><a href="make-a-quiz.html">Create a quiz</a></li>
+    <li><a class="active" href="take-a-quiz.html">Take a quiz</a></li>
+    <li class="right"><a href="#about">About</a></li>
+  </ul>
+  <div id="quizContainer">
+    <!-- Quiz questions and options will be dynamically added here -->
+  </div>
+  <div id="buttonContainer">
+    <button id="prevQuestion">Previous</button>
+    <span id="questionCounter"></span> <!-- Counter goes here -->
+    <button id="nextQuestion">Next</button>
+  </div>
+  <button id="submitQuiz">Submit Quiz</button>
+  <div id="quizResult"></div>
+
+
+
+  <script>
+    // Get the quiz data from the local storage
+    let quizData = JSON.parse(localStorage.getItem('quiz'));
+
+    let quizContainer = document.getElementById('quizContainer');
+    let prevButton = document.getElementById('prevQuestion');
+    let nextButton = document.getElementById('nextQuestion');
+    let submitButton = document.getElementById('submitQuiz');
+    let quizResult = document.getElementById('quizResult');
+    let navbar = document.getElementById('navbar');
+
+    let host = 'http://localhost:8080';
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function renderQuestion() {
+      let question = quizData.questions[currentQuestionIndex];
+
+      let questionElement = document.createElement('div');
+      questionElement.classList.add('question');
+
+      // Create an image element
+      let imageElement = document.createElement('img');
+      imageElement.src = `http://localhost:8080/questions/${question.id}/image`;
+      imageElement.style.width = '100%'; // Set the image width to 100%
+      questionElement.appendChild(imageElement);
+
+      let questionDescription = document.createElement('h3');
+      questionDescription.textContent = `${question.description}`;
+      questionElement.appendChild(questionDescription);
+
+      let optionsList = document.createElement('ul');
+      optionsList.classList.add('options');
+      question.choices.forEach((choice, index) => {
+        let optionItem = document.createElement('li');
+        let optionInput = document.createElement('input');
+        optionInput.type = 'radio';
+        optionInput.name = `question-${currentQuestionIndex}`;
+        optionInput.value = choice;
+        optionInput.dataset.questionIndex = currentQuestionIndex;
+        optionInput.addEventListener('click', saveAnswer);
+        if (localStorage.getItem(`answer-${currentQuestionIndex}`) === choice) {
+          optionInput.checked = true;
+        }
+        let optionLabel = document.createElement('label');
+        optionLabel.textContent = choice;
+        optionLabel.prepend(optionInput);
+        optionItem.appendChild(optionLabel);
+        optionsList.appendChild(optionItem);
+      });
+      questionElement.appendChild(optionsList);
+
+      // Add the counter at the bottom
+      let counterElement = document.getElementById('questionCounter');
+      counterElement.textContent = `Question ${currentQuestionIndex + 1} out of ${quizData.questions.length}`;
+
+      quizContainer.innerHTML = '';
+      quizContainer.appendChild(questionElement);
+
+      if (currentQuestionIndex === quizData.questions.length - 1) {
+        submitButton.style.display = 'block';
+      } else {
+        submitButton.style.display = 'none';
+      }
+    }
+
+
+    function saveAnswer(event) {
+      let questionIndex = event.target.dataset.questionIndex;
+      let selectedAnswer = event.target.value;
+      localStorage.setItem(`answer-${questionIndex}`, selectedAnswer); // Save the answer to local storage
+    }
+
+    function submitQuiz() {
+      // Calculate score based on saved answers
+      score = 0;
+      quizData.questions.forEach((question, index) => {
+        let savedAnswer = localStorage.getItem(`answer-${index}`);
+        if (savedAnswer === question.answer) {
+          score++;
+        }
+      });
+
+      showQuizResult();
+      showNavbar(); // Show the navbar after submission
+      hideButtons(); // Hide the buttons after submission
+      clearAnswers(); // Clear the answers from local storage
+    }
+
+
+    function showQuizResult() {
+      let totalQuestions = quizData.questions.length;
+      let resultText = `You scored ${score} out of ${totalQuestions}`;
+      quizResult.innerHTML = `
+      <h3 style="text-align: center;">You completed ${quizData.title}</h3>
+      <h3 style="text-align: center;">${resultText}</h3>`;
+      submitButton.disabled = true;
+
+      // Show the navbar
+      navbar.style.display = 'block';
+
+      // Hide the quiz container
+      quizContainer.style.display = 'none';
+      buttonContainer.style.display = 'none';
+    }
+
+    function clearAnswers() {
+      // Clear all saved answers from local storage
+      for (let i = 0; i < quizData.questions.length; i++) {
+        localStorage.removeItem(`answer-${i}`);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < quizData.questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      }
+    }
+
+    function hideButtons() {
+      prevButton.style.display = 'none';
+      nextButton.style.display = 'none';
+      submitButton.style.display = 'none';
+    }
+
+    function showNavbar() {
+      navbar.style.display = 'block';
+    }
+
+    function hideNavbar() {
+      navbar.style.display = 'none';
+    }
+
+    prevButton.addEventListener('click', prevQuestion);
+    nextButton.addEventListener('click', nextQuestion);
+    submitButton.addEventListener('click', submitQuiz);
+
+    renderQuestion();
+    hideNavbar();
+  </script>
 </body>
+
 </html>

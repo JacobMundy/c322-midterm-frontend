@@ -17,5 +17,21 @@
     border: 1px solid yellow;
   }
 
+  .parent-container {
+    display: flex;
+    flex-direction: row;
+  }
   
-
+  .child-div {
+    width: 60%;
+    margin-right: 5%;
+    outline: 1px solid rgb(182, 119, 67);
+    padding: 10px;
+    border-radius: 5px;
+  }
+ 
+  #optionContainer {
+   width: 40%;
+   
+  }
+  

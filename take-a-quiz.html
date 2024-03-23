@@ -3,9 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="general.css">
+  <link rel="stylesheet" href="navbar.css">
+  <link rel="stylesheet" href="cards.css">
   <title>Document</title>
 </head>
 <body>
-  
+  <ul class="topnav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="add-question.html">Add questions</a></li>
+    <li><a href="make-a-quiz.html">Create a quiz</a></li>
+    <li><a class="active" href="take-a-quiz.html">Take a quiz</a></li>
+    <li class="right"><a href="#about">About</a></li>
+  </ul>
+  <div class="parent-container">
+    <div id="optionContainer" style="text-align: center;">
+      <h1>Take a Quiz</h1>
+      <h3>Click on the quiz you want to take.</h3>
+      <div id="quizList" class="card-container">
+
+      </div>
+    </div>
+  <script>
+
+    let host = "localhost:8080";
+    let quizList = document.getElementById("quizList");
+
+    getQuizzes();
+
+    async function getQuizzes() {
+      let response = await fetch(`http://${host}/quizzes`);
+      let data = await response.json();
+
+      console.log(data);
+
+      data.forEach((quiz) => {
+        let card = document.createElement("div");
+        card.innerHTML = `
+          <div class="card">
+            <div class="container">
+              <h4><b>${quiz.title}</b></h4>
+              <p>${quiz.questions.length} questions</p>
+            </div>
+          </div>
+        `;
+        
+        card.onclick = () => {
+          localStorage.setItem("quiz", JSON.stringify(quiz));
+          window.location.href = "quiz.html";
+        };
+        quizList.appendChild(card);
+      });
+    }
+
+  </script>
 </body>
 </html>

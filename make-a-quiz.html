@@ -1,11 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="general.css">
+  <link rel="stylesheet" href="navbar.css">
+  <link rel="stylesheet" href="cards.css">
+  <link rel="stylesheet" href="make-a-quiz.css">
   <title>Document</title>
 </head>
+
 <body>
-  
+  <ul class="topnav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="add-question.html">Add questions</a></li>
+    <li><a class="active" href="make-a-quiz.html">Create a quiz</a></li>
+    <li><a href="take-a-quiz.html">Take a quiz</a></li>
+    <li class="right"><a href="#about">About</a></li>
+  </ul>
+  <div class="parent-container">
+    <div class="child-div">
+      <ul id="list"></ul>
+    </div>
+    <div id="optionContainer">
+      <h1>New Quiz</h1>
+      <h3>to remove a question click on it</h3>
+      <label for="quizName">Quiz Name:</label>
+      <input id="userSubmittedName">
+      <button onclick="addQuiz(event)">Save Quiz</button>
+      <ul id="quizList"></ul>
+    </div>
+  </div>
+  <script>
+    let host = "localhost:8080";
+    let list = document.getElementById("list");
+    let addedQuestions = [];
+    let questions = {};
+    let question = {
+      id: "",
+      description: "",
+      answer: "",
+      choices: [],
+    };
+    let questionsListed = false;
+
+    getQuestions();
+
+    async function getQuestions() {
+      let response = await fetch(`http://${host}/questions`);
+      let data = await response.json();
+      questions = data;
+      list.innerHTML = "";
+      console.log(questions);
+      if (!questionsListed) {
+        listQuestions();
+      }
+      questionsListed = true;
+    }
+
+    function listQuestions() {
+      questions.forEach((q) => {
+        let card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="container" onclick="addQuestion(event)" data-id="${q.id}">
+            <img src="http://${host}/questions/${q.id}/image" alt="Avatar" style="width:100%">
+            <h4><b>${q.id}</b></h4>
+            <h2>${q.description}</h2>
+            <form>
+          <input type="radio" id="q${q.id}ptionA" name="q1Answer" value="A">
+          <label for="q${q.id}ptionA">${q.choices[0]}</label><br>
+
+          <input type="radio" id="q${q.id}ptionB" name="q2Answer" value="B">
+          <label for="q${q.id}ptionB">${q.choices[1]}</label><br>
+
+          <input type="radio" id="q${q.id}ptionC" name="q3Answer" value="C">
+          <label for="q${q.id}ptionC">${q.choices[2]}</label><br>       
+      </form> 
+          </div>
+          `;
+        list.appendChild(card);
+      });
+    }
+
+    async function addQuiz(event) {
+      event.preventDefault(); // Prevent the default form submission behavior
+      if (addedQuestions.length === 0) {
+        alert('Please add at least one question to the quiz');
+        return;
+      }
+      let quizName = document.getElementById("userSubmittedName").value;
+      let quizQuestions = addedQuestions;
+      let quizNum = 0;
+      let response = await fetch(`http://${host}/quizzes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: quizNum,
+          quizTitle: quizName,
+          questionIds: quizQuestions
+        })
+      });
+      let data = await response.json();
+      console.log(JSON.stringify({
+        id: quizNum,
+        quizTitle: quizName,
+        questionIds: quizQuestions
+      }));
+      console.log(data);
+    }
+
+    function addQuestion(event) {
+      let questionId = parseInt(event.currentTarget.getAttribute('data-id'));
+      console.log(questionId);
+      if (addedQuestions.includes(questionId)) {
+        return;
+      }
+      let question = questions.find(q => q.id === questionId);
+      let card = document.createElement("div");
+      let quizList = document.getElementById("quizList");
+      card.className = "card";
+      card.setAttribute('data-id', question.id);
+      card.addEventListener('click', removeQuestion);
+      card.innerHTML = `
+        <h2>Question Id: ${question.id}</h2>
+        <p>Answer: ${question.answer}</p>
+      `;
+      quizList.appendChild(card);
+      addedQuestions.push(question.id);
+    }
+
+    function removeQuestion(event) {
+      let questionId = parseInt(event.currentTarget.getAttribute('data-id'));
+      let questionIndex = addedQuestions.indexOf(questionId);
+      if (questionIndex !== -1) {
+        addedQuestions.splice(questionIndex, 1); // Remove the question ID from the addedQuestions array
+        event.currentTarget.remove(); // Remove the card element from the DOM
+      }
+    }
+
+    function add() {
+      question.question = document.getElementById("questionText").value;
+      question.options.push(document.getElementById("optionAText").value);
+      question.options.push(document.getElementById("optionBText").value);
+      question.options.push(document.getElementById("optionCText").value);
+      question.answer = document.querySelector('input[name="answer"]:checked').value;
+      question.image = document.getElementById("imageUpload").value;
+      questions.push(question);
+      question = {
+        question: "",
+        options: [],
+        answer: "",
+        image: "",
+      };
+      list.innerHTML = "";
+      questions.forEach((q) => {
+        let card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${q.question}</h2>
+          <p>${q.options[0]}</p>
+          <p>${q.options[1]}</p>
+          <p>${q.options[2]}</p>
+          <p>${q.answer}</p>
+          <p>${q.image}</p>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+  </script>
 </body>
+
 </html>
